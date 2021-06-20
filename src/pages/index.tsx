@@ -27,7 +27,7 @@ export default function Home({ product }: HomeProps) {
             Get access to all the publications <br />
             <span>for {product.amount} month</span>
           </p>
-          <SubscribeButton />
+          <SubscribeButton priceId={product.priceId} />
         </section>
 
         <img src="/images/avatar.svg" alt="Girl Coding" />
@@ -37,9 +37,7 @@ export default function Home({ product }: HomeProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const price = await stripe.prices.retrieve('price_1J3qdQAb9buBh76R4Y33FfXO', {
-    expand: ['product'], // dá acesso a todas as informações do produto
-  })
+  const price = await stripe.prices.retrieve('price_1J3qdQAb9buBh76R4Y33FfXO');
 
   const product = {
     priceId: price.id,
@@ -47,11 +45,11 @@ export const getServerSideProps: GetServerSideProps = async () => {
       style: 'currency',
       currency: 'USD',
     }).format(price.unit_amount / 100),
-  }
+  };
 
   return {
     props: {
       product,
     }
-  }
+  };
 }
