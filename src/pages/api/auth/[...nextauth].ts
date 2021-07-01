@@ -35,8 +35,10 @@ export default NextAuth({
             ),
             // Se ele existe, daremos um "select" nele
             q.Get(
-              q.Match('user_by_email'),
-              q.Casefold(user.email)
+              q.Match(
+                q.Index('user_by_email'),
+                q.Casefold(user.email)
+              ),
             )
           )
         )
