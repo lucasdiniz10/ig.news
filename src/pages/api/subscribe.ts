@@ -20,13 +20,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const user = await fauna.query<User>(
       q.Get(
         q.Match(
-          q.Index('user_by_email'), // quero procurar um usuário por email
-          q.Casefold(session.user.email) // que o email é igual a...
+          q.Index('user_by_email'),
+          q.Casefold(session.user.email)
         )
       )
     )
 
-    // verificando existencia de user no stripe
     let customerId = user.data.stripe_customer_id;
 
     if (!customerId) {
@@ -38,7 +37,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         q.Update(
           q.Ref(q.Collection('users'), user.ref.id),
           {
-            // aqui passamos quais dados queremos atualizar
             data: {
               stripe_customer_id: stripeCustomer.id,
             }
@@ -48,8 +46,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       customerId = stripeCustomer.id;
     }
-
-
 
     const stripeCheckoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
