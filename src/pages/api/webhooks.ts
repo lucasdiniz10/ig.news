@@ -16,6 +16,12 @@ async function buffer(readable: Readable) {
   return Buffer.concat(chunks);
 }
 
+export const config = {
+  api: {
+    bodyParser: false
+  }
+}
+
 const relevantEvents = new Set([
   'checkout.session.completed',
   'customer.subscription.updated',
@@ -49,12 +55,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
               subscription.id,
               subscription.customer.toString(),
               false,
-            );
+            )
 
             break;
           case 'checkout.session.completed':
 
-            const checkoutSession = event.data.object as Stripe.Checkout.Session
+            const checkoutSession = event.data.object as Stripe.Checkout.Session;
 
             await saveSubscription(
               checkoutSession.subscription.toString(),
@@ -66,7 +72,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           default:
             throw new Error('Unhadled event.')
         }
-      } catch (error) {
+      } catch (err) {
+        console.error(err)
         return res.status(400).json({ error: 'Webhook handler failed.' })
       }
     }
